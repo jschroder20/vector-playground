@@ -21,7 +21,8 @@ public class MouseReporter extends GraphicsProgram {
 	// It is called an "instance" variable
 	private GLabel label = new GLabel("");
 	
-	public void run() {	
+	public void run() {
+		addMouseListeners();
 		// this code already adds the label to the screen!
 		// run it to see what it does.
 		label.setFont("Courier-24");
@@ -34,7 +35,23 @@ public class MouseReporter extends GraphicsProgram {
 		// add the label to the screen!
 		add(label, INDENT, getHeight()/2);
 	}
-	
+
+
+	public void mouseMoved(MouseEvent e) {
+		double x = e.getX();
+		double y = e.getY();
+		label.setLabel((int)x + "," + (int)y);
+
+		GObject maybe = getElementAt(x,y);
+		if (maybe !=null){
+			label.setColor(Color.RED);
+
+		} else {
+			label.setColor(Color.BLUE);
+		}
+
+
+	}
 
 
 }

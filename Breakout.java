@@ -14,7 +14,15 @@ import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 
+
 public class Breakout extends GraphicsProgram {
+	Color bg = new Color(4, 0, 44);
+
+
+	@Override
+	public void setBackground(Color bg) {
+		super.setBackground(bg);
+	}
 
 	// Dimensions of the canvas, in pixels
 	// These should be used when setting up the initial size of the game,
@@ -66,15 +74,52 @@ public class Breakout extends GraphicsProgram {
 	// Number of turns 
 	public static final int NTURNS = 3;
 
+	Color BURGUNDY = new Color(99, 3, 28);
+	Color DARK_GREEN = new Color(0, 74, 34);
+
+
 	public void run() {
-		// Set the window's title bar text
+		//setBackground(bg);
+		addMouseListeners();
+
+
 		setTitle("CS 106A Breakout");
 
 		// Set the canvas size.  In your code, remember to ALWAYS use getWidth()
 		// and getHeight() to get the screen dimensions, not these constants!
 		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		/* You fill this in, along with any subsidiary methods */
+
+
+		GRect paddle = new GRect (getWidth()/2-PADDLE_WIDTH/2, getHeight()-PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
+		paddle.setFilled(true);
+		paddle.setFillColor(DARK_GREEN);
+		add(paddle);
+
+		ball();
 	}
 
-}
+	public void ball(){
+		GOval ball = new GOval(0, 0, BALL_RADIUS, BALL_RADIUS);
+		ball.setFillColor(BURGUNDY);
+		ball.setFilled(true);
+		add(ball);
+
+		int dx = 1;
+		int dy = 1;
+
+		while(true){
+			pause(5);
+			ball.move(dx, dy);
+
+			if((ball.getBottomY() > getHeight()) || (ball.getY() < 0)){
+				dy *= -1;
+			}
+			if(ball.getRightX() > getWidth() || (ball.getX() < 0)){
+				dx *= -1;
+			}
+
+		}
+	}
+
+	}
