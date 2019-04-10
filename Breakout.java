@@ -18,6 +18,10 @@ import java.awt.event.*;
 public class Breakout extends GraphicsProgram {
 	Color bg = new Color(4, 0, 44);
 
+	GRect paddle = drawPaddle();
+	GOval ball = drawBall();
+	GRect brick;
+
 
 	@Override
 	public void setBackground(Color bg) {
@@ -77,39 +81,61 @@ public class Breakout extends GraphicsProgram {
 	Color BURGUNDY = new Color(99, 3, 28);
 	Color DARK_GREEN = new Color(0, 74, 34);
 
+	public void mouseMoved(MouseEvent e) {
+		double moveX = e.getX();
+
+		paddle.setLocation(moveX-(PADDLE_WIDTH/2), getHeight()-PADDLE_Y_OFFSET);
+		add(paddle);
+
+	}
 
 	public void run() {
 		//setBackground(bg);
 		addMouseListeners();
-
-
-		setTitle("CS 106A Breakout");
+		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
 
 		// Set the canvas size.  In your code, remember to ALWAYS use getWidth()
 		// and getHeight() to get the screen dimensions, not these constants!
 		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
+		for(int j=0; j<NBRICK_COLUMNS; j++){
+			for(int k=0; k<NBRICK_ROWS; k++){
+				brick = new GRect((k+1)*BRICK_SEP+k*BRICK_WIDTH,BRICK_Y_OFFSET+j*BRICK_HEIGHT+j*BRICK_SEP,BRICK_WIDTH, BRICK_HEIGHT);
+				brick.setFilled(true);
+				if(j==0 || j==1){
+					brick.setColor(Color.RED);
+				} else if(j==2 || j==3){
+					brick.setColor(Color.ORANGE);
+				} else if(j==4 || j==5){
+					brick.setColor(Color.YELLOW);
+				} else if(j==6 || j==7){
+					brick.setColor(Color.GREEN);
+				} else if(j==8 || j==9) {
+					brick.setColor(Color.CYAN);
+				}
+				add(brick);
+			}
+		}
+		add(ball);
+		moveBall();
 
-
-		GRect paddle = new GRect (getWidth()/2-PADDLE_WIDTH/2, getHeight()-PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
-		paddle.setFilled(true);
-		paddle.setFillColor(DARK_GREEN);
-		add(paddle);
-
-		ball();
+		if(ball.getX()>brick.getX() && ball.getRightX()<brick.getRightX() && ball.getBottomY()==brick.getY()) {
+			remove(brick);
+		}
 	}
 
-	public void ball(){
+	public GOval drawBall(){
 		GOval ball = new GOval(0, 0, BALL_RADIUS, BALL_RADIUS);
-		ball.setFillColor(BURGUNDY);
+		ball.setColor(Color.BLACK);
 		ball.setFilled(true);
-		add(ball);
-
+		return(ball);
+	}
+	public void moveBall(){
 		int dx = 1;
 		int dy = 1;
 
 		while(true){
-			pause(5);
+			pause(3);
 			ball.move(dx, dy);
 
 			if((ball.getBottomY() > getHeight()) || (ball.getY() < 0)){
@@ -118,8 +144,20 @@ public class Breakout extends GraphicsProgram {
 			if(ball.getRightX() > getWidth() || (ball.getX() < 0)){
 				dx *= -1;
 			}
+			if(ball.getX()>paddle.getX() && ball.getRightX()<paddle.getRightX() && ball.getBottomY()==paddle.getY()) {
+				dy *= -1;
+			}
+
 
 		}
 	}
 
+	public GRect drawPaddle() {
+		GRect paddle = new GRect (getWidth()/2-PADDLE_WIDTH/2, getHeight()-PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
+		paddle.setFilled(true);
+		paddle.setColor(Color.BLACK);
+		return(paddle);
 	}
+
+
+}
