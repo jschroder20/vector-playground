@@ -59,7 +59,7 @@ public class Breakout extends GraphicsProgram {
 	public static final double PADDLE_HEIGHT = 10;
 
 	// Offset of the paddle up from the bottom 
-	public static final double PADDLE_Y_OFFSET = 30;
+	public static final double PADDLE_Y_OFFSET = 200;
 
 	// Radius of the ball in pixels
 	public static final double BALL_RADIUS = 10;
@@ -103,29 +103,49 @@ public class Breakout extends GraphicsProgram {
 				brick = new GRect((k+1)*BRICK_SEP+k*BRICK_WIDTH,BRICK_Y_OFFSET+j*BRICK_HEIGHT+j*BRICK_SEP,BRICK_WIDTH, BRICK_HEIGHT);
 				brick.setFilled(true);
 				if(j==0 || j==1){
-					brick.setColor(Color.RED);
+					brick.setFillColor(Color.RED);
 				} else if(j==2 || j==3){
-					brick.setColor(Color.ORANGE);
+					brick.setFillColor(Color.ORANGE);
 				} else if(j==4 || j==5){
-					brick.setColor(Color.YELLOW);
+					brick.setFillColor(Color.YELLOW);
 				} else if(j==6 || j==7){
-					brick.setColor(Color.GREEN);
+					brick.setFillColor(Color.GREEN);
 				} else if(j==8 || j==9) {
-					brick.setColor(Color.CYAN);
+					brick.setFillColor(Color.CYAN);
 				}
 				add(brick);
 			}
 		}
 		add(ball);
-		moveBall();
+		int dx = 1;
+		int dy = 1;
 
-		if(ball.getX()>brick.getX() && ball.getRightX()<brick.getRightX() && ball.getBottomY()==brick.getY()) {
-			remove(brick);
+		while(true) {
+			pause(3);
+			ball.move(dx, dy);
+
+			//bounce off bottom & top
+			if ((ball.getBottomY() > getHeight()) || (ball.getY() < 0)) {
+				dy *= -1;
+			}
+			//bounce off right & left
+			if (ball.getRightX() > getWidth() || (ball.getX() < 0)) {
+				dx *= -1;
+			}
+
+			GObject object = getElementAt(ball.getX()+BALL_RADIUS, ball.getBottomY());
+			if (object != null) {
+				dy *= -1;
+				ball.setFillColor(Color.RED);
+				if (object.getY() < getCanvasHeight()/2) {
+					remove(object);
+				}
+			}
 		}
 	}
 
 	public GOval drawBall(){
-		GOval ball = new GOval(0, 0, BALL_RADIUS, BALL_RADIUS);
+		GOval ball = new GOval(300, 300, BALL_RADIUS, BALL_RADIUS);
 		ball.setColor(Color.BLACK);
 		ball.setFilled(true);
 		return(ball);
@@ -138,15 +158,33 @@ public class Breakout extends GraphicsProgram {
 			pause(3);
 			ball.move(dx, dy);
 
+			//bounce off bottom & top
 			if((ball.getBottomY() > getHeight()) || (ball.getY() < 0)){
 				dy *= -1;
 			}
+			//bounce off right & left
 			if(ball.getRightX() > getWidth() || (ball.getX() < 0)){
 				dx *= -1;
 			}
-			if(ball.getX()>paddle.getX() && ball.getRightX()<paddle.getRightX() && ball.getBottomY()==paddle.getY()) {
+
+			GObject object = getElementAt(ball.getX(), ball.getY());
+			if (object != null) {
+				if (object == brick) {
+					remove(brick);
+				}
+				dy*=1;
+			}
+
+			/*if(ball.getX()>paddle.getX() && ball.getRightX()<paddle.getRightX() && ball.getBottomY()==paddle.getY()) {
 				dy *= -1;
 			}
+			if(ball.getRightX()==paddle.getX() && ball.getY()+BALL_RADIUS>paddle.getY() && ball.getY()-BALL_RADIUS<paddle.getBottomY()) {
+				dx *= -1;
+			}
+			if(ball.getX()==paddle.getRightX() && ball.getY()+BALL_RADIUS>paddle.getY() && ball.getY()-BALL_RADIUS<paddle.getBottomY()) {
+				dx *= -1;
+			}*/
+
 
 
 		}
