@@ -21,6 +21,9 @@ public class Breakout extends GraphicsProgram {
 	GRect paddle = drawPaddle();
 	GOval ball = drawBall();
 	GRect brick;
+	int deaths = 0;
+	int bricks = 0;
+	boolean againn;
 
 
 	@Override
@@ -59,7 +62,7 @@ public class Breakout extends GraphicsProgram {
 	public static final double PADDLE_HEIGHT = 10;
 
 	// Offset of the paddle up from the bottom 
-	public static final double PADDLE_Y_OFFSET = 200;
+	public static final double PADDLE_Y_OFFSET = 30;
 
 	// Radius of the ball in pixels
 	public static final double BALL_RADIUS = 10;
@@ -89,7 +92,33 @@ public class Breakout extends GraphicsProgram {
 
 	}
 
-	public void run() {
+    public void mouseClicked(MouseEvent e) {
+
+        GObject object = getElementAt(e.getX(), e.getY());
+        if (object != null) {
+            againn = true;
+        }
+
+	    double moveX = e.getX();
+
+        paddle.setLocation(moveX-(PADDLE_WIDTH/2), getHeight()-PADDLE_Y_OFFSET);
+        add(paddle);
+
+    }
+    public void run() {
+	    playgame();
+
+	    if (deaths<3){
+	        winScreen();
+        } else {
+	        deathScreen();
+	    }
+	    if (againn){
+	        playgame();
+        }
+    }
+
+	public void playgame() {
 		//setBackground(bg);
 		addMouseListeners();
 		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
@@ -116,33 +145,75 @@ public class Breakout extends GraphicsProgram {
 				add(brick);
 			}
 		}
+		GLabel deathCount = new GLabel("Deaths: "+deaths,10,10);
+		deathCount.setColor(Color.BLACK);
+		add(deathCount);
 		add(ball);
 		int dx = 1;
 		int dy = 1;
 
-		while(true) {
+		while(deaths<3) {
 			pause(3);
 			ball.move(dx, dy);
 
 			//bounce off bottom & top
-			if ((ball.getBottomY() > getHeight()) || (ball.getY() < 0)) {
+			if (ball.getY() < 0) {
 				dy *= -1;
 			}
 			//bounce off right & left
-			if (ball.getRightX() > getWidth() || (ball.getX() < 0)) {
+			if (ball.getX() < 0 || ball.getRightX() > getWidth()) {
 				dx *= -1;
 			}
+            if (ball.getBottomY() > getHeight()) {
+                deaths++;
+            }
+
+            if (deaths<3 && (ball.getBottomY() > getHeight())) {
+                deathCount.setLabel("Deaths: "+deaths);
+                pause(1000);
+                ball.setLocation(300,300);
+                pause(200);
+                remove(ball);
+                pause(200);
+                add(ball);
+                pause(200);
+                remove(ball);
+                pause(200);
+                add(ball);
+                dy = 1;
+                dx = 1;
+            }
 
 			GObject object = getElementAt(ball.getX()+BALL_RADIUS, ball.getBottomY());
 			if (object != null) {
 				dy *= -1;
-				ball.setFillColor(Color.RED);
 				if (object.getY() < getCanvasHeight()/2) {
 					remove(object);
+					bricks++;
 				}
 			}
+            System.out.println(bricks);
 		}
 	}
+
+	public void deathScreen(){
+        addMouseListeners();
+        setBackground(Color.red);
+	    removeAll();
+	    remove(paddle);
+	    GLabel lost = new GLabel("You Lost.");
+	    lost.setLocation( (CANVAS_WIDTH-lost.getWidth())/2, (CANVAS_HEIGHT-lost.getHeight())/2);
+	    add(lost);
+
+        GLabel again = new GLabel("Play again?");
+        again.setLocation( (CANVAS_WIDTH-lost.getWidth())/2, (CANVAS_HEIGHT-lost.getHeight())/2+50);
+        add(again);
+
+    }
+
+    public void winScreen(){
+
+    }
 
 	public GOval drawBall(){
 		GOval ball = new GOval(300, 300, BALL_RADIUS, BALL_RADIUS);
