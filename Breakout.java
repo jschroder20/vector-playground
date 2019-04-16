@@ -23,10 +23,15 @@ public class Breakout extends GraphicsProgram {
 	GRect brick;
 	int deaths = 0;
 	int bricks = 0;
-	boolean againn;
+	boolean againn = false;
+	boolean play = true;
+    GRect button = drawButton();
+    GLabel playAgainButton = drawPlayAgainButton();
+    boolean loop = true;
 
 
-	@Override
+
+    @Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 	}
@@ -76,7 +81,7 @@ public class Breakout extends GraphicsProgram {
 	public static final double VELOCITY_X_MAX = 3.0;
 
 	// Animation delay or pause time between ball moves (ms)
-	public static final double DELAY = 1000.0 / 60.0;
+	public double DELAY = 1000.0 / 60.0;
 
 	// Number of turns 
 	public static final int NTURNS = 3;
@@ -95,37 +100,39 @@ public class Breakout extends GraphicsProgram {
     public void mouseClicked(MouseEvent e) {
 
         GObject object = getElementAt(e.getX(), e.getY());
-        if (object != null) {
+        if (object != null && object.getY()>=327) {
             againn = true;
         }
-
-	    double moveX = e.getX();
-
-        paddle.setLocation(moveX-(PADDLE_WIDTH/2), getHeight()-PADDLE_Y_OFFSET);
-        add(paddle);
-
     }
     public void run() {
-	    playgame();
+        setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
+        setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	    if (deaths<3){
-	        winScreen();
-        } else {
-	        deathScreen();
-	    }
-	    if (againn){
-	        playgame();
+        while(loop) {
+            playgame();
+
+            if (deaths < 3) {
+                clearCanvas();
+                winScreen();
+            } else {
+                clearCanvas();
+                deathScreen();
+            }
+            clearCanvas();
+            if (!againn) {
+                loop = false;
+            }
         }
     }
 
 	public void playgame() {
-		//setBackground(bg);
+	    setBackground(Color.white);
 		addMouseListeners();
-		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
-
-		// Set the canvas size.  In your code, remember to ALWAYS use getWidth()
-		// and getHeight() to get the screen dimensions, not these constants!
-		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+		paddle.setColor(Color.black);
+		bricks = 0;
+		deaths = 0;
+		againn = false;
+        play = true;
 
 		for(int j=0; j<NBRICK_COLUMNS; j++){
 			for(int k=0; k<NBRICK_ROWS; k++){
@@ -152,8 +159,8 @@ public class Breakout extends GraphicsProgram {
 		int dx = 1;
 		int dy = 1;
 
-		while(deaths<3) {
-			pause(3);
+		while(play) {
+			pause(DELAY);
 			ball.move(dx, dy);
 
 			//bounce off bottom & top
@@ -168,7 +175,7 @@ public class Breakout extends GraphicsProgram {
                 deaths++;
             }
 
-            if (deaths<3 && (ball.getBottomY() > getHeight())) {
+            if (deaths<NTURNS && (ball.getBottomY() > getHeight())) {
                 deathCount.setLabel("Deaths: "+deaths);
                 pause(1000);
                 ball.setLocation(300,300);
@@ -182,6 +189,16 @@ public class Breakout extends GraphicsProgram {
                 add(ball);
                 dy = 1;
                 dx = 1;
+            }
+
+            if (bricks == 1){
+                DELAY- 5 = DELAY;
+            }
+            if (deaths == NTURNS){
+                play = false;
+            }
+            if (bricks >= 15){
+                play = false;
             }
 
 			GObject object = getElementAt(ball.getX()+BALL_RADIUS, ball.getBottomY());
@@ -199,19 +216,25 @@ public class Breakout extends GraphicsProgram {
 	public void deathScreen(){
         addMouseListeners();
         setBackground(Color.red);
-	    removeAll();
-	    remove(paddle);
+        clearCanvas();
 	    GLabel lost = new GLabel("You Lost.");
 	    lost.setLocation( (CANVAS_WIDTH-lost.getWidth())/2, (CANVAS_HEIGHT-lost.getHeight())/2);
 	    add(lost);
 
-        GLabel again = new GLabel("Play again?");
-        again.setLocation( (CANVAS_WIDTH-lost.getWidth())/2, (CANVAS_HEIGHT-lost.getHeight())/2+50);
-        add(again);
 
+
+
+        add(button);
+        add(playAgainButton);
+
+        while(!againn){
+            pause(1000);
+        }
     }
 
     public void winScreen(){
+	    clearCanvas();
+	    setBackground(Color.green);
 
     }
 
@@ -221,45 +244,7 @@ public class Breakout extends GraphicsProgram {
 		ball.setFilled(true);
 		return(ball);
 	}
-	public void moveBall(){
-		int dx = 1;
-		int dy = 1;
 
-		while(true){
-			pause(3);
-			ball.move(dx, dy);
-
-			//bounce off bottom & top
-			if((ball.getBottomY() > getHeight()) || (ball.getY() < 0)){
-				dy *= -1;
-			}
-			//bounce off right & left
-			if(ball.getRightX() > getWidth() || (ball.getX() < 0)){
-				dx *= -1;
-			}
-
-			GObject object = getElementAt(ball.getX(), ball.getY());
-			if (object != null) {
-				if (object == brick) {
-					remove(brick);
-				}
-				dy*=1;
-			}
-
-			/*if(ball.getX()>paddle.getX() && ball.getRightX()<paddle.getRightX() && ball.getBottomY()==paddle.getY()) {
-				dy *= -1;
-			}
-			if(ball.getRightX()==paddle.getX() && ball.getY()+BALL_RADIUS>paddle.getY() && ball.getY()-BALL_RADIUS<paddle.getBottomY()) {
-				dx *= -1;
-			}
-			if(ball.getX()==paddle.getRightX() && ball.getY()+BALL_RADIUS>paddle.getY() && ball.getY()-BALL_RADIUS<paddle.getBottomY()) {
-				dx *= -1;
-			}*/
-
-
-
-		}
-	}
 
 	public GRect drawPaddle() {
 		GRect paddle = new GRect (getWidth()/2-PADDLE_WIDTH/2, getHeight()-PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -267,6 +252,20 @@ public class Breakout extends GraphicsProgram {
 		paddle.setColor(Color.BLACK);
 		return(paddle);
 	}
+
+	public GRect drawButton() {
+	    GRect button = new GRect(181.5, 327.0, 68.0, 21.0);
+        button.setColor(Color.BLUE);
+        button.setFilled(true);
+        return(button);
+    }
+
+    public GLabel drawPlayAgainButton() {
+        playAgainButton = new GLabel("Play again?");
+        playAgainButton.setLocation(184, 340);
+        playAgainButton.setColor(Color.WHITE);
+        return(playAgainButton);
+    }
 
 
 }
