@@ -24,14 +24,13 @@ public class Breakout extends GraphicsProgram {
 	int deaths = 0;
 	int bricks = 0;
 	boolean againn = false;
-	boolean play = true;
-    GRect button = drawButton();
-    GLabel playAgainButton = drawPlayAgainButton();
-    boolean loop = true;
+	boolean play = false;
+	GRect button = drawButton();
+	GLabel playAgainButton = drawPlayAgainButton();
+	boolean loop = true;
 
 
-
-    @Override
+	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 	}
@@ -81,86 +80,105 @@ public class Breakout extends GraphicsProgram {
 	public static final double VELOCITY_X_MAX = 3.0;
 
 	// Animation delay or pause time between ball moves (ms)
-	public double DELAY = 1000.0 / 60.0;
+	double DELAY = 1000.0 / 60.0;
 
 	// Number of turns 
 	public static final int NTURNS = 3;
 
-	Color BURGUNDY = new Color(99, 3, 28);
-	Color DARK_GREEN = new Color(0, 74, 34);
+	Color one = new Color(42, 245, 24);
+	Color two = new Color(27,215,187);
+	Color three = new Color(20,201,203);
+	Color four = new Color(15,190,216);
+	Color five = new Color(8,179,229);
 
 	public void mouseMoved(MouseEvent e) {
 		double moveX = e.getX();
 
-		paddle.setLocation(moveX-(PADDLE_WIDTH/2), getHeight()-PADDLE_Y_OFFSET);
+		/*if (moveX < PADDLE_WIDTH/2){
+			moveX = 30;
+		} else if (moveX > CANVAS_WIDTH- PADDLE_WIDTH/2){
+			moveX = CANVAS_WIDTH-PADDLE_WIDTH;
+		}
+*/
+			paddle.setLocation(moveX - (PADDLE_WIDTH / 2), getHeight() - PADDLE_Y_OFFSET);
+
 		add(paddle);
 
 	}
 
-    public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent e) {
 
-        GObject object = getElementAt(e.getX(), e.getY());
-        if (object != null && object.getY()>=327) {
-            againn = true;
-        }
-    }
-    public void run() {
-        setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
-        setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+		GObject object = getElementAt(e.getX(), e.getY());
+		if (object != null && object.getY() >= 327) {
+			againn = true;
+		}
+		if (object != null && object.getY() <250){
+			play = true;
+		}
+	}
 
-        while(loop) {
-            playgame();
 
-            if (deaths < 3) {
-                clearCanvas();
-                winScreen();
-            } else {
-                clearCanvas();
-                deathScreen();
-            }
-            clearCanvas();
-            if (!againn) {
-                loop = false;
-            }
-        }
-    }
+	public void run() {
+		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
+		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+
+		startScreen();
+
+		while (loop) {
+			playgame();
+
+			if (deaths < 3) {
+				winScreen();
+			} else {
+				deathScreen();
+			}
+			clearCanvas();
+
+			if (!againn) {
+				loop = false;
+			}
+		}
+	}
 
 	public void playgame() {
-	    setBackground(Color.white);
+		clearCanvas();
+		setBackground(Color.white);
 		addMouseListeners();
 		paddle.setColor(Color.black);
+		ball.setLocation(300,300);
 		bricks = 0;
 		deaths = 0;
 		againn = false;
-        play = true;
+		play = true;
 
-		for(int j=0; j<NBRICK_COLUMNS; j++){
-			for(int k=0; k<NBRICK_ROWS; k++){
-				brick = new GRect((k+1)*BRICK_SEP+k*BRICK_WIDTH,BRICK_Y_OFFSET+j*BRICK_HEIGHT+j*BRICK_SEP,BRICK_WIDTH, BRICK_HEIGHT);
+		for (int j = 0; j < NBRICK_COLUMNS; j++) {
+			for (int k = 0; k < NBRICK_ROWS; k++) {
+				brick = new GRect((k + 1) * BRICK_SEP + k * BRICK_WIDTH, BRICK_Y_OFFSET + j * BRICK_HEIGHT + j * BRICK_SEP, BRICK_WIDTH, BRICK_HEIGHT);
 				brick.setFilled(true);
-				if(j==0 || j==1){
-					brick.setFillColor(Color.RED);
-				} else if(j==2 || j==3){
-					brick.setFillColor(Color.ORANGE);
-				} else if(j==4 || j==5){
-					brick.setFillColor(Color.YELLOW);
-				} else if(j==6 || j==7){
-					brick.setFillColor(Color.GREEN);
-				} else if(j==8 || j==9) {
-					brick.setFillColor(Color.CYAN);
+				if (j == 0 || j == 1) {
+					brick.setFillColor(one);
+				} else if (j == 2 || j == 3) {
+					brick.setFillColor(two);
+				} else if (j == 4 || j == 5) {
+					brick.setFillColor(three);
+				} else if (j == 6 || j == 7) {
+					brick.setFillColor(four);
+				} else if (j == 8 || j == 9) {
+					brick.setFillColor(five);
 				}
 				add(brick);
 			}
 		}
-		GLabel deathCount = new GLabel("Deaths: "+deaths,10,10);
+		GLabel deathCount = new GLabel("Deaths: " + deaths, 10, 10);
 		deathCount.setColor(Color.BLACK);
 		add(deathCount);
 		add(ball);
 		int dx = 1;
 		int dy = 1;
 
-		while(play) {
-			pause(DELAY);
+		while (play) {
+			pause(DELAY - 5 - 1 * (bricks / 10));
 			ball.move(dx, dy);
 
 			//bounce off bottom & top
@@ -171,72 +189,97 @@ public class Breakout extends GraphicsProgram {
 			if (ball.getX() < 0 || ball.getRightX() > getWidth()) {
 				dx *= -1;
 			}
-            if (ball.getBottomY() > getHeight()) {
-                deaths++;
-            }
+			if (ball.getBottomY() > getHeight()) {
+				deaths++;
+			}
 
-            if (deaths<NTURNS && (ball.getBottomY() > getHeight())) {
-                deathCount.setLabel("Deaths: "+deaths);
-                pause(1000);
-                ball.setLocation(300,300);
-                pause(200);
-                remove(ball);
-                pause(200);
-                add(ball);
-                pause(200);
-                remove(ball);
-                pause(200);
-                add(ball);
-                dy = 1;
-                dx = 1;
-            }
+			if (deaths < NTURNS && (ball.getBottomY() > getHeight())) {
+				deathCount.setLabel("Deaths: " + deaths);
+				pause(1000);
+				ball.setLocation(300, 300);
+				pause(200);
+				remove(ball);
+				pause(200);
+				add(ball);
+				pause(200);
+				remove(ball);
+				pause(200);
+				add(ball);
+				dy = 1;
+				dx = 1;
+			}
 
-            if (bricks == 1){
-                DELAY- 5 = DELAY;
-            }
-            if (deaths == NTURNS){
-                play = false;
-            }
-            if (bricks >= 15){
-                play = false;
-            }
 
-			GObject object = getElementAt(ball.getX()+BALL_RADIUS, ball.getBottomY());
+			if (deaths == NTURNS) {
+				play = false;
+			}
+			if (bricks == 100) {
+				play = false;
+			}
+
+			GObject object = getElementAt(ball.getX() + BALL_RADIUS, ball.getBottomY());
 			if (object != null) {
 				dy *= -1;
-				if (object.getY() < getCanvasHeight()/2) {
+				if (object.getY() < getCanvasHeight() / 2) {
 					remove(object);
 					bricks++;
 				}
 			}
-            System.out.println(bricks);
+			System.out.println(bricks);
 		}
 	}
 
-	public void deathScreen(){
-        addMouseListeners();
-        setBackground(Color.red);
-        clearCanvas();
-	    GLabel lost = new GLabel("You Lost.");
-	    lost.setLocation( (CANVAS_WIDTH-lost.getWidth())/2, (CANVAS_HEIGHT-lost.getHeight())/2);
-	    add(lost);
+	public void deathScreen() {
+		addMouseListeners();
+		setBackground(Color.red);
+		paddle.setColor(Color.red);
+		clearCanvas();
+		GLabel lost = new GLabel("You Lost.");
+		lost.setLocation((CANVAS_WIDTH - lost.getWidth()) / 2, (CANVAS_HEIGHT - lost.getHeight()) / 2);
+		add(lost);
 
 
+		add(button);
+		add(playAgainButton);
 
+		while (!againn) {
+			pause(1000);
+		}
+	}
 
-        add(button);
-        add(playAgainButton);
+	public void winScreen() {
+		clearCanvas();
+		setBackground(Color.green);
+		paddle.setColor(Color.green);
 
-        while(!againn){
-            pause(1000);
-        }
-    }
+		GLabel win = new GLabel("Congrats! You Won!");
+		win.setLocation((CANVAS_WIDTH - win.getWidth()) / 2, (CANVAS_HEIGHT - win.getHeight()) / 2);
+		add(win);
 
-    public void winScreen(){
-	    clearCanvas();
-	    setBackground(Color.green);
+		add(button);
+		add(playAgainButton);
 
-    }
+		while (!againn) {
+			pause(1000);
+		}
+
+	}
+
+	public void startScreen(){
+		clearCanvas();
+		setBackground(Color.cyan);
+		paddle.setColor(Color.CYAN);
+		GLabel brickbreaker = new GLabel("BRICKBREAKER", 100, 100);
+		add(brickbreaker);
+
+		GLabel playy = new GLabel ("PLAY?", 100, 200);
+		add(playy);
+
+		while(!play){
+			pause(100);
+		}
+
+	}
 
 	public GOval drawBall(){
 		GOval ball = new GOval(300, 300, BALL_RADIUS, BALL_RADIUS);
