@@ -14,26 +14,21 @@ import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
 public class Breakout extends GraphicsProgram {
-	Color bg = new Color(4, 0, 44);
 
-	GRect paddle = drawPaddle();
-	GOval ball = drawBall();
-	GRect brick;
+	//initalize variables & objects
+
 	int deaths = 0;
 	int bricks = 0;
 	boolean againn = false;
 	boolean play = false;
-	GRect button = drawButton();
-	GLabel playAgainButton = drawPlayAgainButton();
 	boolean loop = true;
 
-
-	@Override
-	public void setBackground(Color bg) {
-		super.setBackground(bg);
-	}
+	GRect paddle = drawPaddle();
+	GOval ball = drawBall();
+	GRect brick;
+	GRect button = drawButton();
+	GLabel playAgainButton = drawPlayAgainButton();
 
 	// Dimensions of the canvas, in pixels
 	// These should be used when setting up the initial size of the game,
@@ -85,44 +80,36 @@ public class Breakout extends GraphicsProgram {
 	// Number of turns 
 	public static final int NTURNS = 3;
 
-	Color one = new Color(42, 245, 24);
-	Color two = new Color(27,215,187);
-	Color three = new Color(20,201,203);
-	Color four = new Color(15,190,216);
-	Color five = new Color(8,179,229);
 
+	//method to move the paddle with cursor
 	public void mouseMoved(MouseEvent e) {
 		double moveX = e.getX();
-
-		/*if (moveX < PADDLE_WIDTH/2){
-			moveX = 30;
-		} else if (moveX > CANVAS_WIDTH- PADDLE_WIDTH/2){
-			moveX = CANVAS_WIDTH-PADDLE_WIDTH;
-		}
-*/
+		if(e.getX() >= paddle.getWidth()/2 && e.getX() <= getCanvasWidth()-(paddle.getWidth()/2)) {
 			paddle.setLocation(moveX - (PADDLE_WIDTH / 2), getHeight() - PADDLE_Y_OFFSET);
-
+		}
 		add(paddle);
 
 	}
 
+	//method for play again + start buttons
 	public void mouseClicked(MouseEvent e) {
-
 		GObject object = getElementAt(e.getX(), e.getY());
 		if (object != null && object.getY() >= 327) {
 			againn = true;
 		}
-		if (object != null && object.getY() <250){
+		if (object != null && object.getY() <327){
 			play = true;
 		}
+
+
 	}
 
-
+	//run method
 	public void run() {
 		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
 		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-
+		deathScreen();
 		startScreen();
 
 		while (loop) {
@@ -141,7 +128,9 @@ public class Breakout extends GraphicsProgram {
 		}
 	}
 
-	public void playgame() {
+	//method that plays game
+	private void playgame() {
+		//initialization
 		clearCanvas();
 		setBackground(Color.white);
 		addMouseListeners();
@@ -152,36 +141,42 @@ public class Breakout extends GraphicsProgram {
 		againn = false;
 		play = true;
 
+		//creates brick grid
 		for (int j = 0; j < NBRICK_COLUMNS; j++) {
 			for (int k = 0; k < NBRICK_ROWS; k++) {
 				brick = new GRect((k + 1) * BRICK_SEP + k * BRICK_WIDTH, BRICK_Y_OFFSET + j * BRICK_HEIGHT + j * BRICK_SEP, BRICK_WIDTH, BRICK_HEIGHT);
 				brick.setFilled(true);
 				if (j == 0 || j == 1) {
-					brick.setFillColor(one);
+					brick.setFillColor(new Color(42, 245, 24));
 				} else if (j == 2 || j == 3) {
-					brick.setFillColor(two);
+					brick.setFillColor(new Color(27,215,187));
 				} else if (j == 4 || j == 5) {
-					brick.setFillColor(three);
+					brick.setFillColor(new Color(20,201,203));
 				} else if (j == 6 || j == 7) {
-					brick.setFillColor(four);
+					brick.setFillColor(new Color(15,190,216));
 				} else if (j == 8 || j == 9) {
-					brick.setFillColor(five);
+					brick.setFillColor(new Color(8,179,229));
 				}
 				add(brick);
 			}
 		}
+
+		//creates deathcounter
 		GLabel deathCount = new GLabel("Deaths: " + deaths, 10, 10);
 		deathCount.setColor(Color.BLACK);
 		add(deathCount);
+
+		//add ball + set initial movement
 		add(ball);
 		int dx = 1;
 		int dy = 1;
 
 		while (play) {
+			//move ball
 			pause(DELAY - 5 - 1 * (bricks / 10));
 			ball.move(dx, dy);
 
-			//bounce off bottom & top
+			//bounce off top
 			if (ball.getY() < 0) {
 				dy *= -1;
 			}
@@ -189,10 +184,13 @@ public class Breakout extends GraphicsProgram {
 			if (ball.getX() < 0 || ball.getRightX() > getWidth()) {
 				dx *= -1;
 			}
+
+			//increase deaths if ball is at bottom
 			if (ball.getBottomY() > getHeight()) {
 				deaths++;
 			}
 
+			//reset ball if # of deaths is less than three
 			if (deaths < NTURNS && (ball.getBottomY() > getHeight())) {
 				deathCount.setLabel("Deaths: " + deaths);
 				pause(1000);
@@ -209,14 +207,16 @@ public class Breakout extends GraphicsProgram {
 				dx = 1;
 			}
 
-
+			//end game if # of deaths is three
 			if (deaths == NTURNS) {
 				play = false;
 			}
+			//end game if all bricks are destroyed
 			if (bricks == 100) {
 				play = false;
 			}
 
+			//check if ball is touching brick + remove brick if so, increase "bricks" variable
 			GObject object = getElementAt(ball.getX() + BALL_RADIUS, ball.getBottomY());
 			if (object != null) {
 				dy *= -1;
@@ -229,25 +229,32 @@ public class Breakout extends GraphicsProgram {
 		}
 	}
 
+	//method displaying death screen
 	public void deathScreen() {
+		//add objects/set screen
 		addMouseListeners();
-		setBackground(Color.red);
-		paddle.setColor(Color.red);
+		setBackground(new Color (255, 70, 97));
+		paddle.setColor(new Color (255, 70, 97));
 		clearCanvas();
 		GLabel lost = new GLabel("You Lost.");
-		lost.setLocation((CANVAS_WIDTH - lost.getWidth()) / 2, (CANVAS_HEIGHT - lost.getHeight()) / 2);
+		lost.setFont(new Font("Comic Sans MS", Font.BOLD, 60));
+
+		lost.setLocation((getCanvasWidth()-lost.getWidth())/2, 200);
 		add(lost);
 
 
 		add(button);
 		add(playAgainButton);
 
+		//keep checking to see if the player clicked the play again button
 		while (!againn) {
-			pause(1000);
+			pause(10);
 		}
 	}
 
+	//method displaying win screen
 	public void winScreen() {
+		//add objects/set screen
 		clearCanvas();
 		setBackground(Color.green);
 		paddle.setColor(Color.green);
@@ -259,28 +266,38 @@ public class Breakout extends GraphicsProgram {
 		add(button);
 		add(playAgainButton);
 
+		//keep checking to see if the player clicked the play again button
 		while (!againn) {
-			pause(1000);
+			pause(10);
 		}
-
 	}
 
+	//start screen
 	public void startScreen(){
+		//add objects/set screen
 		clearCanvas();
-		setBackground(Color.cyan);
-		paddle.setColor(Color.CYAN);
-		GLabel brickbreaker = new GLabel("BRICKBREAKER", 100, 100);
+		setBackground(new Color(15,190,216));
+		paddle.setColor(new Color(15,190,216));
+		GLabel brickbreaker = new GLabel("BRICKBREAKER");
+		brickbreaker.setFont(new Font("Comic Sans MS", Font.BOLD, 40));
+
+		brickbreaker.setLocation((getCanvasWidth()-brickbreaker.getWidth())/2, 100);
 		add(brickbreaker);
 
-		GLabel playy = new GLabel ("PLAY?", 100, 200);
+		GLabel playy = new GLabel ("PLAY?");
+		playy.setFont(new Font("Comic Sans MS", Font.BOLD, 60));
+
+		playy.setLocation((getCanvasWidth()-playy.getWidth())/2, 300);
 		add(playy);
 
+		//keep checking to see if the player has pressed the "play" button
 		while(!play){
-			pause(100);
+			pause(10);
 		}
 
 	}
 
+	//method that draws the ball
 	public GOval drawBall(){
 		GOval ball = new GOval(300, 300, BALL_RADIUS, BALL_RADIUS);
 		ball.setColor(Color.BLACK);
@@ -288,7 +305,7 @@ public class Breakout extends GraphicsProgram {
 		return(ball);
 	}
 
-
+	//method that draws the paddle
 	public GRect drawPaddle() {
 		GRect paddle = new GRect (getWidth()/2-PADDLE_WIDTH/2, getHeight()-PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
 		paddle.setFilled(true);
@@ -296,19 +313,23 @@ public class Breakout extends GraphicsProgram {
 		return(paddle);
 	}
 
+	//method that draws play again button
 	public GRect drawButton() {
-	    GRect button = new GRect(181.5, 327.0, 68.0, 21.0);
-        button.setColor(Color.BLUE);
+	    GRect button = new GRect(120, 310, 180, 42);
+        button.setColor(new Color(1, 1, 1,0));
         button.setFilled(true);
         return(button);
     }
 
+    //method that draws the play again button text
     public GLabel drawPlayAgainButton() {
         playAgainButton = new GLabel("Play again?");
-        playAgainButton.setLocation(184, 340);
+		playAgainButton.setFont(new Font("Comic Sans MS", Font.BOLD, 30));
+
+		playAgainButton.setLocation(130, 340);
         playAgainButton.setColor(Color.WHITE);
         return(playAgainButton);
-    }
 
+    }
 
 }
