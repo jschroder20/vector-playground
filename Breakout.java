@@ -109,7 +109,6 @@ public class Breakout extends GraphicsProgram {
 		setTitle("BREAKOUT!1!11!!! sksjskssjsksjk");
 		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		deathScreen();
 		startScreen();
 
 		while (loop) {
