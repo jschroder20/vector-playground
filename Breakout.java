@@ -29,6 +29,7 @@ public class Breakout extends GraphicsProgram {
 	GRect brick;
 	GRect button = drawButton();
 	GLabel playAgainButton = drawPlayAgainButton();
+	GOval life = drawLife();
 
 	// Dimensions of the canvas, in pixels
 	// These should be used when setting up the initial size of the game,
@@ -141,27 +142,20 @@ public class Breakout extends GraphicsProgram {
 		play = true;
 
 		//creates brick grid
+		Color[] colors = new Color[]{new Color(58, 255, 151), new Color(27,215,187), new Color(20,201,203), new Color(15,190,216), new Color(8,179,229)};
 		for (int j = 0; j < NBRICK_COLUMNS; j++) {
 			for (int k = 0; k < NBRICK_ROWS; k++) {
 				brick = new GRect((k + 1) * BRICK_SEP + k * BRICK_WIDTH, BRICK_Y_OFFSET + j * BRICK_HEIGHT + j * BRICK_SEP, BRICK_WIDTH, BRICK_HEIGHT);
 				brick.setFilled(true);
-				if (j == 0 || j == 1) {
-					brick.setFillColor(new Color(42, 245, 24));
-				} else if (j == 2 || j == 3) {
-					brick.setFillColor(new Color(27,215,187));
-				} else if (j == 4 || j == 5) {
-					brick.setFillColor(new Color(20,201,203));
-				} else if (j == 6 || j == 7) {
-					brick.setFillColor(new Color(15,190,216));
-				} else if (j == 8 || j == 9) {
-					brick.setFillColor(new Color(8,179,229));
-				}
+				brick.setColor(colors[j/2]);
 				add(brick);
 			}
 		}
 
 		//creates deathcounter
-		GLabel deathCount = new GLabel("Deaths: " + deaths, 10, 10);
+		GLabel deathCount = new GLabel("Deaths: " + deaths);
+		deathCount.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
+		deathCount.setLocation(10,20);
 		deathCount.setColor(Color.BLACK);
 		add(deathCount);
 
@@ -169,6 +163,8 @@ public class Breakout extends GraphicsProgram {
 		add(ball);
 		int dx = 1;
 		int dy = 1;
+
+		int turn = 0;
 
 		while (play) {
 			//move ball
@@ -211,8 +207,18 @@ public class Breakout extends GraphicsProgram {
 				play = false;
 			}
 			//end game if all bricks are destroyed
-			if (bricks == 100) {
+			if (bricks == 5) {
 				play = false;
+			}
+
+			//in-progress code for a life power-up
+			if (bricks == 1) {
+				if (turn == 0) {
+					life.setLocation(ball.getX(), ball.getY());
+					System.out.println("NEW LIFE");
+				}
+				turn++;
+				//add(life);
 			}
 
 			//check if ball is touching brick + remove brick if so, increase "bricks" variable
@@ -224,8 +230,8 @@ public class Breakout extends GraphicsProgram {
 					bricks++;
 				}
 			}
-			System.out.println(bricks);
 		}
+
 	}
 
 	//method displaying death screen
@@ -235,12 +241,11 @@ public class Breakout extends GraphicsProgram {
 		setBackground(new Color (255, 70, 97));
 		paddle.setColor(new Color (255, 70, 97));
 		clearCanvas();
-		GLabel lost = new GLabel("You Lost.");
+		GLabel lost = new GLabel("You Lost");
 		lost.setFont(new Font("Comic Sans MS", Font.BOLD, 60));
 
 		lost.setLocation((getCanvasWidth()-lost.getWidth())/2, 200);
 		add(lost);
-
 
 		add(button);
 		add(playAgainButton);
@@ -255,11 +260,13 @@ public class Breakout extends GraphicsProgram {
 	public void winScreen() {
 		//add objects/set screen
 		clearCanvas();
-		setBackground(Color.green);
-		paddle.setColor(Color.green);
+		setBackground(new Color(44, 191, 81));
+		paddle.setColor(new Color(44, 191, 81));
 
-		GLabel win = new GLabel("Congrats! You Won!");
-		win.setLocation((CANVAS_WIDTH - win.getWidth()) / 2, (CANVAS_HEIGHT - win.getHeight()) / 2);
+		GLabel win = new GLabel("You Won!");
+		win.setFont(new Font("Comic Sans MS", Font.BOLD, 60));
+
+		win.setLocation((getCanvasWidth()-win.getWidth())/2, 200);
 		add(win);
 
 		add(button);
@@ -315,8 +322,8 @@ public class Breakout extends GraphicsProgram {
 	//method that draws play again button
 	public GRect drawButton() {
 	    GRect button = new GRect(120, 310, 180, 42);
-        button.setColor(new Color(1, 1, 1,0));
-        button.setFilled(true);
+        button.setColor(new Color(255, 255, 255));
+
         return(button);
     }
 
@@ -328,7 +335,13 @@ public class Breakout extends GraphicsProgram {
 		playAgainButton.setLocation(130, 340);
         playAgainButton.setColor(Color.WHITE);
         return(playAgainButton);
-
     }
 
+    public GOval drawLife(){
+		life = new GOval(10,10);
+		life.setFilled(true);
+
+		life.setColor(Color.PINK);
+		return(life);
+	}
 }
