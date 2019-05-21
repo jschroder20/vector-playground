@@ -2,6 +2,7 @@ import acm.program.GraphicsProgram;
 import acm.graphics.*;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * MouseDrag -- implement simple mouse drag in a window.
@@ -26,17 +27,26 @@ public class Playground extends GraphicsProgram {
 	private GPolygon vectorOneShadow = drawVectorOneShadow();
 	private GPolygon vectorTwoShadow = drawVectorTwoShadow();
 
+	private boolean add = false;
+
+	public void mouseClicked(MouseEvent e) {
+		GObject object = getElementAt(e.getX(), e.getY());
+		if (object != null && object.getY() <= 10) {
+			add = true;
+			System.out.println("CLICK");
+		}
+
+
+	}
+
 	public void run(){
 		setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 		drawPlane();
+		drawAddVectorsButton();
 
 		add(vectorOne);
 		add(vectorTwo);
-		pause(100);
-		add(vectorOneShadow);
-		add(vectorTwoShadow);
-		addVectors();
 
 		GLabel vectorOneLabel = new GLabel("<"+x1+","+y1+">", 30,30);
 		vectorOneLabel.setColor(Color.green);
@@ -46,9 +56,21 @@ public class Playground extends GraphicsProgram {
 		vectorTwoLabel.setColor(Color.blue);
 		add(vectorTwoLabel);
 
-		GLabel addVectorsLabel = new GLabel("<"+(x1+x2)+","+(y1+y2)+">", 30,70);
-		addVectorsLabel.setColor(Color.red);
-		add(addVectorsLabel);
+
+
+		while(true) {
+			if (add) {
+				System.out.println("ADD");
+				add(vectorOneShadow);
+				add(vectorTwoShadow);
+				addVectors();
+				GLabel addVectorsLabel = new GLabel("<"+(x1+x2)+","+(y1+y2)+">", 30,70);
+				addVectorsLabel.setColor(Color.red);
+				add(addVectorsLabel);
+			}
+		}
+
+
 
 
 
@@ -204,6 +226,16 @@ public class Playground extends GraphicsProgram {
 		vector.setLocation(origin);
 		add(vector);
 
+	}
+
+	public void drawAddVectorsButton(){
+
+		GRect button = new GRect(500,10,80,30);
+		button.setFilled(true);
+		button.setFillColor(new Color(143, 143, 143));
+
+
+		add(button);
 	}
 
 }
