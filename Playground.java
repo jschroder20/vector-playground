@@ -12,7 +12,7 @@ public class Playground extends GraphicsProgram {
 	private double x1 = -60;
 	private double y1 = -50;
 
-	private double x2 = 50;
+	private double x2 = -50;
 	private double y2 = 100;
 
 	private int width = 2;
@@ -187,8 +187,8 @@ public class Playground extends GraphicsProgram {
 			theta = 270;
 		} else if(x==0 && y==0){
 			theta = 0;
-		} else if (x<0) {
-			theta = (360*Math.atan((y/x)/6.28));
+		} else if(x<0){
+			theta = ((360 * Math.atan(y/(x)))/6.28)+180;
 		} else {
 			theta = (360*Math.atan(y/x))/6.28;
 		}
